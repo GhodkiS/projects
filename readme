@@ -1,4 +1,8 @@
 version: 1.0
 content:
    project:
-     kubernetes: mongoproject
+     - topic: kubernetes: 
+            - project:  mongoproject
+            - project: nginx
+     - topic: terraform:
+            - project:             
