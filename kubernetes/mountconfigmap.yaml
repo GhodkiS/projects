@@ -1,0 +1,36 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+   name: myconfigmap
+data:
+  username: david
+  userfile: testfile
+immutable: true
+---
+kind: Pod
+apiVersion: v1
+metadata:
+   name: mypod
+spec:
+  volumes:
+    - name: myvolume
+      configMap:
+          name: myconfigmape
+          items:
+            - key: userfile
+              path: userfile
+  containers:
+       - image: nginx:perl
+         name: mycontainer
+         ports:
+           - containerPort: 8080
+         volumeMounts:
+           - name: myvolume  
+             mountPath: /etc/volume
+         env:
+           - name: myenv
+             valueFrom:
+                configMapKeyRef:
+                        name: myconfigmap
+                        key: username

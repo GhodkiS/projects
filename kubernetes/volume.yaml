@@ -1,0 +1,50 @@
+kind: Secret
+apiVersion: v1
+metadata:
+    name: volume-secret
+type: Opaque
+data:
+  username1: dXNlcm5hbWU=
+  password1: cGFzc3dvcmQ=
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+   name: volume-cm
+data:
+  url1: mongourl
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mypod
+spec:
+  volumes:
+   - name: host-volume
+     hostPath:
+        path: /data
+        type: DirectoryOrCreate
+   - name: secret-volume
+     secret:
+        secretName: volume-secret
+        items:
+           - key: username1
+             path: myusername
+           - key: password1
+             path: mypassword
+   - name: cm-volume
+     configMap:
+       name: volume-cm
+       items:
+         - key: url1
+           path: myurl
+  containers: 
+        - name: mypod
+          image: nginx:perl
+          volumeMounts:
+               - name: host-volume
+                 mountPath: /test
+               - name: secret-volume
+                 mountPath: /secret
+               - name: cm-volume
+                 mountPath: /cm
