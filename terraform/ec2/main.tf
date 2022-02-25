@@ -27,6 +27,7 @@ resource "aws_instance" "app_server" {
 
   ami           = "ami-009726b835c24a3aa"
   instance_type = "t2.micro"
+  count = 2
 
   tags = {
 
@@ -36,18 +37,3 @@ resource "aws_instance" "app_server" {
   }
 
 }
-
-resource "aws_instance" "app_server_proxy" {
-
-  ami           = "ami-009726b835c24a3aa"
-  instance_type = "t2.micro"
-
-  tags = {
-
-    name = var.proxy_server_name
-
-
-  }
-
-}
-
