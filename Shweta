@@ -1,0 +1,94 @@
+description: Validate Register GET API with valid parameters.
+tags: ["Slice01,openDayOffline, Register"]
+actors:
+    - actorType: API
+      steps:
+
+        - step: 1
+          actions:
+            - description: GET request for API with valid inputs
+              macro: api.npos.posChannel.BusinessDay.posNodeStatus.request
+              args:
+                url: $data("api/npos/POSChannel/BusinessDay/posNodeStatus").testCase1.url
+                verb: GET
+                #restaurantId: $data("api/npos/POSChannel/BusinessDay/posNodeStatus").testCase1.requestData.requestQueryParam.restaurantId
+                testCase: posNodeStatus/testCase1
+
+
+        - step: 2
+          actions:
+            - description: Validate response code 
+              script: |
+                var responseBody = $localData.responseBody;
+                $log("Response Body =" +JSON.stringify(responseBody))
+                var responseStatusCode = $localData.statusCode;
+                if(responseStatusCode == 200){
+                  $log("Response status code validated :"+responseStatusCode);
+                }
+                else {
+                  $log("Invalid response status code :"+responseStatusCode);
+                } 
+
+        - step: 3
+          actions:
+            - description: Verify the response body
+              script: |  
+                var mockData = $data("api/npos/POSChannel/BusinessDay/posNodeStatus").testCase1.responseData.responseBody                        
+                $log("Mock Data:" +mockData)     
+
+                var responseBody = JSON.stringify(responseBody);
+                $log("Response Data:" +responseBody)
+                
+                try {
+                  var parResponseBody =  JSON.parse(responseBody)
+                  $log("ParResponse Data=" +parResponseBody)
+                }
+                catch(e) {
+                    $log.error("null or invalid json response")
+                    throw 'null or invalid json response'    
+                }
+
+                
+              
+                for(var responseKey in parResponseBody)
+                {
+                  //$log(responseKey)
+                  var keyFound = 0
+                  for(var mockKey in mockData )
+                  {
+
+                    if(responseKey.localeCompare(mockKey) == 0)
+                    {
+                      $log(responseKey + "-->" + mockKey)
+                      $log(parResponseBody[responseKey] + " --> " + mockData[mockKey])
+                      if((parResponseBody[responseKey]).localeCompare(mockData[mockKey]) != 0)
+                      {
+                        $log.error("response data is not same as moc data")
+                        throw 'response data is not same as moc data'
+
+                      }
+                      keyFound = 1
+                      //$log("key found: " + keyFound)
+                    }                
+
+                  }
+
+                  if(keyFound == 0)
+                  {                   
+                    $log.error("response key not found: " + responseKey)
+                    throw "response key not found: " + responseKey 
+                  }
+                                  
+                }
+                
+    ================================================================================================
+    
+Output:
+Mock Data:{data={channels=[{POS0001={status=Opened, isOperatorLogged=false}}, {POS0002={status=Opened, isOperatorLogged=false}}, {POS0016={status=Opened, isOperatorLogged=false}}, {POS0017={status=Blocked, isOperatorLogged=false}}]}}
+
+Response Data:{"data":{"channels":[{"POS0001":{"status":"Opened","isOperatorLogged":false}},{"POS0002":{"status":"Opened","isOperatorLogged":false}},{"POS0016":{"status":"Opened","isOperatorLogged":false}},{"POS0017":{"status":"Blocked","isOperatorLogged":false}}]}}
+
+ParResponse Data={"data":{"channels":[{"POS0001":{"status":"Opened","isOperatorLogged":false}},{"POS0002":{"status":"Opened","isOperatorLogged":false}},{"POS0016":{"status":"Opened","isOperatorLogged":false}},{"POS0017":{"status":"Blocked","isOperatorLogged":false}}]}}
+               
+
+        
